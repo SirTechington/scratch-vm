@@ -129,6 +129,7 @@ const Ev3Mode = {
     touch: 0, // touch
     color: 1, // ambient
     ultrasonic: 1, // inch
+    gyro: 0, //angle
     none: 0
 };
 
@@ -140,7 +141,8 @@ const Ev3Mode = {
 const Ev3Label = {
     touch: 'button',
     color: 'brightness',
-    ultrasonic: 'distance'
+    ultrasonic: 'distance',
+    gyro: 'angle'
 };
 
 /**
@@ -468,6 +470,7 @@ class EV3 {
         this._sensors = {
             distance: 0,
             brightness: 0,
+            angle: 0,
             buttons: [0, 0, 0, 0]
         };
 
@@ -531,6 +534,10 @@ class EV3 {
 
     get brightness () {
         return this._sensors.brightness;
+    }
+
+    get angle () {
+        return this._sensors.angle;
     }
 
     /**
@@ -634,6 +641,7 @@ class EV3 {
         this._sensors = {
             distance: 0,
             brightness: 0,
+            angle: 0,
             buttons: [0, 0, 0, 0]
         };
         this._motors = [null, null, null, null];
@@ -884,7 +892,7 @@ class EV3 {
                     // Read a button value per port
                     this._sensors.buttons[i] = value ? value : 0;
                 } else if (Ev3Label[this._sensorPorts[i]]) { // if valid
-                    // Read brightness / distance values and set to 0 if null
+                    // Read brightness / distance /angle values and set to 0 if null
                     this._sensors[Ev3Label[this._sensorPorts[i]]] = value ? value : 0;
                 }
                 offset += 4;
@@ -1121,6 +1129,15 @@ class Scratch3Ev3Blocks {
                     blockType: BlockType.REPORTER
                 },
                 {
+                    opcode: 'getAngle',
+                    text: formatMessage({
+                        id: 'ev3.getAngle',
+                        default: 'angle',
+                        description: 'gets measured angle'
+                    }),
+                    blockType: BlockType.REPORTER
+                },
+                {
                     opcode: 'beep',
                     text: formatMessage({
                         id: 'ev3.beepNote',
@@ -1257,6 +1274,10 @@ class Scratch3Ev3Blocks {
 
     getBrightness () {
         return this._peripheral.brightness;
+    }
+
+    getAngle () {
+        return this._peripheral.angle;
     }
 
     _playNoteForPicker (note, category) {
