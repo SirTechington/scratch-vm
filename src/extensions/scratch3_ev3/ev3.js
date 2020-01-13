@@ -2,6 +2,13 @@ const uid = require('../../util/uid');
 const BT = require('../../io/bt');
 const Base64Util = require('../../util/base64-util');
 const RateLimiter = require('../../util/rateLimiter.js');
+const Ev3Args = require('./ev3_args');
+const Ev3Encoding = require('./ev3_encoding');
+const Ev3Command = require('./ev3_command');
+const Ev3Opcode = require('./ev3_opcode');
+const Ev3Device = require('./ev3_device');
+const Ev3Mode = require('./ev3_mode');
+const Ev3Label = require('./ev3_label');
 
 /**
  * String with Ev3 expected pairing pin.
@@ -14,121 +21,6 @@ const Ev3PairingPin = '1234';
  * @type {number}
  */
 const BTSendRateMax = 40;
-
-/**
- * Enum for Ev3 parameter encodings of various argument and return values.
- * Found in the 'EV3 Firmware Developer Kit', section4, page 9, at
- * https://education.lego.com/en-us/support/mindstorms-ev3/developer-kits.
- *
- * The format for these values is:
- * 0xxxxxxx for Short Format
- * 1ttt-bbb for Long Format
- *
- * @readonly
- * @enum {number}
- */
-const Ev3Encoding = {
-    ONE_BYTE: 0x81, // = 0b1000-001, "1 byte to follow"
-    TWO_BYTES: 0x82, // = 0b1000-010, "2 bytes to follow"
-    FOUR_BYTES: 0x83, // = 0b1000-011, "4 bytes to follow"
-    GLOBAL_VARIABLE_ONE_BYTE: 0xE1, // = 0b1110-001, "1 byte to follow"
-    GLOBAL_CONSTANT_INDEX_0: 0x20, // = 0b00100000
-    GLOBAL_VARIABLE_INDEX_0: 0x60 // = 0b01100000
-};
-
-/**
- * Enum for Ev3 direct command types.
- * Found in the 'EV3 Communication Developer Kit', section 4, page 24, at
- * https://education.lego.com/en-us/support/mindstorms-ev3/developer-kits.
- * @readonly
- * @enum {number}
- */
-const Ev3Command = {
-    DIRECT_COMMAND_REPLY: 0x00,
-    DIRECT_COMMAND_NO_REPLY: 0x80,
-    DIRECT_REPLY: 0x02
-};
-
-/**
- * Enum for Ev3 commands opcodes.
- * Found in the 'EV3 Firmware Developer Kit', section 4, page 10, at
- * https://education.lego.com/en-us/support/mindstorms-ev3/developer-kits.
- * @readonly
- * @enum {number}
- */
-const Ev3Opcode = {
-    OPOUTPUT_STEP_SPEED: 0xAE,
-    OPOUTPUT_TIME_SPEED: 0xAF,
-    OPOUTPUT_STOP: 0xA3,
-    OPOUTPUT_RESET: 0xA2,
-    OPOUTPUT_STEP_SYNC: 0xB0,
-    OPOUTPUT_TIME_SYNC: 0xB1,
-    OPOUTPUT_GET_COUNT: 0xB3,
-    OPSOUND: 0x94,
-    OPSOUND_CMD_TONE: 1,
-    OPSOUND_CMD_STOP: 0,
-    OPINPUT_DEVICE_LIST: 0x98,
-    OPINPUT_READSI: 0x9D
-};
-
-/**
- * Enum for Ev3 values used as arguments to various opcodes.
- * Found in the 'EV3 Firmware Developer Kit', section4, page 10-onwards, at
- * https://education.lego.com/en-us/support/mindstorms-ev3/developer-kits.
- * @readonly
- * @enum {number}
- */
-const Ev3Args = {
-    LAYER: 0, // always 0, chained EV3s not supported
-    COAST: 0,
-    BRAKE: 1,
-    RAMP: 50, // time in milliseconds
-    DO_NOT_CHANGE_TYPE: 0,
-    MAX_DEVICES: 32 // 'Normally 32' from pg. 46
-};
-
-/**
- * Enum for Ev3 device type numbers.
- * Found in the 'EV3 Firmware Developer Kit', section 5, page 100, at
- * https://education.lego.com/en-us/support/mindstorms-ev3/developer-kits.
- * @readonly
- * @enum {string}
- */
-const Ev3Device = {
-    29: 'color',
-    30: 'ultrasonic',
-    32: 'gyro',
-    16: 'touch',
-    8: 'mediumMotor',
-    7: 'largeMotor',
-    126: 'none',
-    125: 'none'
-};
-
-/**
- * Enum for Ev3 device modes.
- * Found in the 'EV3 Firmware Developer Kit', section 5, page 100, at
- * https://education.lego.com/en-us/support/mindstorms-ev3/developer-kits.
- * @readonly
- * @enum {number}
- */
-const Ev3Mode = {
-    touch: 0, // touch
-    color: 1, // ambient
-    ultrasonic: 1, // inch
-    none: 0
-};
-
-/**
- * Enum for Ev3 device labels used in the Scratch blocks/UI.
- * @readonly
- * @enum {string}
- */
-const Ev3Label = {
-    touch: 'button',
-    color: 'brightness',
-    ultrasonic: 'distance'
-};
 
 /**
  * Manage power, direction, and timers for one EV3 motor.
